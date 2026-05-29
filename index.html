@@ -1,82 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <title>Diyar Borak Akademi</title>
+    <!-- Konfeti efekti için kütüphane -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        /* İnsan psikolojisine uygun renk paleti */
-        :root {
-            --bg: #f4f7f6;      /* Huzurlu bir krem tonu */
-            --accent: #2a9d8f;  /* Odaklanmayı artıran turkuaz */
-            --text: #264653;    /* Gözü yormayan koyu gri */
-        }
-        body { 
-            background-color: var(--bg); 
-            color: var(--text); 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            padding: 30px; 
-            text-align: center; 
-        }
-        .card { 
-            background: white; 
-            padding: 40px; 
-            border-radius: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            max-width: 500px; 
-            margin: auto; 
-        }
-        h2 { color: var(--accent); }
-        .btn { 
-            background-color: var(--accent); 
-            color: white; 
-            padding: 12px 25px; 
-            border: none; 
-            border-radius: 50px; 
-            cursor: pointer; 
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .btn:hover { background-color: #21867a; transform: scale(1.05); }
-        input { 
-            padding: 12px; 
-            width: 80%; 
-            border: 2px solid #ddd; 
-            border-radius: 10px; 
-            margin-bottom: 20px; 
-        }
+        :root { --bg: #f4f7f6; --accent: #2a9d8f; --text: #264653; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 20px; text-align: center; }
+        .card { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
+        .btn { background: var(--accent); color: white; padding: 12px 25px; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
+        input { padding: 12px; width: 80%; border: 2px solid #ddd; border-radius: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2 id="baslik">Ders Yükleniyor...</h2>
-        <p id="ders" style="font-size: 1.1em;"></p>
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <p id="aciklama"></p>
         <input type="text" id="cevap" placeholder="Cevabını buraya yaz...">
         <br>
         <button class="btn" onclick="kontrol()">Cevabı Gönder</button>
     </div>
 
     <script>
-        // Müfredat burada güncellenecek
-        const mudredat = [
-            {u: "Ünite 1: Selamlaşma", d: "İspanyolca 'Hola' ile selam verilir. 'H' harfi okunmaz. Kendini geliştirmek için her gün 5 defa sesli söyle.", s: "İspanyolca 'Merhaba' nasıl yazılır?", c: "hola"}
+        // Offline durum takibi
+        window.addEventListener('offline', () => alert("⚠️ İnternet yok, yerel verilerdesin!"));
+
+        const dersler = [
+            {u: "Ünite 1: Alfabe", d: "İspanyolca'da 'Hola' ile selamlaşılır.", c: "hola"},
+            {u: "Ünite 2: Sayılar", d: "1'den 3'e: Uno, Dos, Tres.", c: "tres"}
         ];
         
         let sira = 0;
-        // ... (Bundan sonraki JS mantığı aynı kalacak)
-        function dersiBaslat() {
-            document.getElementById('baslik').innerText = mudredat[sira].u;
-            document.getElementById('ders').innerText = mudredat[sira].d;
+        function guncelle() {
+            document.getElementById('baslik').innerText = dersler[sira].u;
+            document.getElementById('aciklama').innerText = dersler[sira].d;
         }
+
         function kontrol() {
             let giris = document.getElementById('cevap').value.toLowerCase();
-            if(giris === mudredat[sira].c) {
-                alert("Harika bir başlangıç! İspanyolca yeteneğin gelişiyor.");
+            if(giris === dersler[sira].c) {
+                // KONFETİ EFEKTİ
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                alert("Tebrikler kanka, bir ünite daha bitti!");
                 sira++;
-                dersiBaslat();
-            } else { alert("Pes etmek yok, tekrar dene!"); }
+                if(sira < dersler.length) { guncelle(); } else { alert("Tüm üniteleri bitirdin, şampiyon!"); }
+            } else { alert("Olmadı kanka, pes etmek yok!"); }
         }
-        dersiBaslat();
+        guncelle();
     </script>
 </body>
 </html>
