@@ -2,336 +2,221 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Diyar-ı Borak Mega Oyun Akademisi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diyar'ın İspanya Fetih Metaverse'ü</title>
+    <!-- Telegram Web App Resmi Kütüphanesi -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #05040a, #0d0a1c, #140f2b);
-            color: white;
-            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #121212;
+            color: #ffffff;
             margin: 0;
-            padding: 10px;
-            user-select: none;
-            overflow-x: hidden;
+            padding: 0;
+            text-align: center;
         }
-        h2 { color: #00d2ff; font-size: 22px; text-shadow: 0 0 10px rgba(0,210,255,0.4); margin: 5px 0; }
-        
-        /* 4'lü Oyun Menüsü Sığdırma Ayarı */
-        .oyun-nav {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-            margin: 12px 0;
+        .header {
+            background: linear-gradient(135deg, #820000, #b30000);
+            padding: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .nav-btn {
-            background: #161030;
-            border: 1px solid #332766;
+        /* Sekme Menüsü */
+        .tabs {
+            display: flex;
+            background: #1e1e1e;
+            justify-content: space-around;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .tab-btn {
+            padding: 15px;
             color: #aaa;
-            padding: 10px 5px;
-            font-size: 11px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .nav-btn.aktif {
-            background: linear-gradient(45deg, #00d2ff, #0066ff);
-            color: white;
+            background: none;
             border: none;
-            box-shadow: 0 0 12px rgba(0,210,255,0.4);
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
         }
-
-        .skor-tabela {
-            font-size: 19px;
-            margin: 10px 0;
-            color: #ffca28;
+        .tab-btn.active {
+            color: #fff;
+            border-bottom: 3px solid #ffcc00;
+            background: #252525;
             font-weight: bold;
-            background: rgba(255, 202, 40, 0.1);
-            padding: 8px;
+        }
+        .content {
+            padding: 20px;
+            display: none;
+        }
+        .content.active {
+            display: block;
+        }
+        /* Harita Tasarımı */
+        .map-card {
+            background: #1e1e1e;
+            margin: 15px auto;
+            padding: 20px;
             border-radius: 10px;
-            display: inline-block;
+            max-width: 400px;
+            border-left: 5px solid #ffcc00;
+            text-align: left;
         }
-
-        .ekran { display: none; max-width: 420px; margin: 0 auto; }
-        .ekran.aktif { display: block; }
-
-        /* OYUN 1: KELİME AVI */
-        .grid-avi { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .kart {
-            background: #120d29; border: 2px solid #23194f; border-radius: 10px;
-            padding: 18px 5px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        .map-card.locked {
+            border-left: 5px solid #555;
+            opacity: 0.6;
         }
-        .secili { background: linear-gradient(135deg, #00d2ff, #0066ff); border-color: #fff; }
-        .dogru { background: linear-gradient(135deg, #2ecc71, #27ae60) !important; opacity: 0.2; pointer-events: none; }
-
-        /* OYUN 2: ZAMANA KARŞI */
-        .soru-kutusu { background: #151033; border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #2e236e; }
-        .soru-kelime { font-size: 24px; font-weight: bold; color: #00d2ff; }
-        .sure-bar-bg { background: #1c1542; height: 8px; border-radius: 4px; margin-top: 15px; overflow: hidden; }
-        .sure-bar { background: #ff416c; width: 100%; height: 100%; transition: width 0.1s linear; }
-        .sik-btn {
-            background: #120d29; border: 2px solid #23194f; color: white; width: 100%;
-            padding: 14px; margin: 6px 0; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer;
+        /* Butonlar */
+        .btn {
+            background: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: 0.2s;
         }
-
-        /* OYUN 3: HAFIZA KARTLARI */
-        .grid-hafiza { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .hafiza-kart {
-            background: #23194f; border-radius: 8px; height: 75px; display: flex;
-            align-items: center; justify-content: center; font-size: 12px; font-weight: bold; cursor: pointer; color: transparent; transition: all 0.25s;
-        }
-        .hafiza-kart.acik { background: #151033; color: white; border: 2px solid #00d2ff; }
-        .hafiza-kart.eslesmis { background: #27ae60; color: white; opacity: 0.3; pointer-events: none; border: none; }
-
-        /* OYUN 4: DOĞRU MU YANLIŞ MI */
-        .tf-karsilastirma { font-size: 22px; margin: 20px 0; font-weight: bold; }
-        .tf-eslesme { color: #ffca28; font-size: 26px; margin: 10px 0; }
-        .btn-grup { display: flex; gap: 10px; }
-        .tf-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; color: white; }
-        .btn-dogru { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-        .btn-yanlis { background: linear-gradient(135deg, #e74c3c, #c0392b); }
-
-        .bitir-btn {
-            margin-top: 20px; background: linear-gradient(45deg, #ff416c, #ff4b2b);
-            color: white; border: none; padding: 14px 35px; font-size: 16px; font-weight: bold; border-radius: 30px; cursor: pointer;
-            box-shadow: 0 5px 15px rgba(255,75,43,0.4); width: 85%; max-width: 350px;
+        .btn:hover { background: #e6b800; }
+        .btn-locked { background: #444; color: #888; cursor: not-allowed; }
+        
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: #222;
+            color: #fff;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
 
-    <h2>⚡ Diyar-ı Borak Oyun Evreni</h2>
-    
-    <div class="oyun-nav">
-        <button class="nav-btn aktif" onclick="ekranDegistir('avi', this)">🎈 Kelime Avı</button>
-        <button class="nav-btn" onclick="ekranDegistir('zamana_karsi', this)">⚡ Zamana Karşı</button>
-        <button class="nav-btn" onclick="ekranDegistir('hafiza', this)">🎴 Hafıza Kartı</button>
-        <button class="nav-btn" onclick="ekranDegistir('dogru_yanlis', this)">❓ Doğru mu?</button>
+    <div class="header">🌍 DİYAR'IN METAVERSE EVRENİ</div>
+
+    <!-- ALT SEKMELER -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('map')">🗺️ Harita</button>
+        <button class="tab-btn" onclick="switchTab('game')">⚔️ Kelime Avı</button>
+        <button class="tab-btn" onclick="switchTab('clan')">🏰 Klan & Saray</button>
     </div>
 
-    <div class="skor-tabela">🔥 Toplam Kazanılan Puan: <span id="genelSkor">0</span> XP</div>
-
-    <div id="ekranAvi" class="ekran aktif">
-        <p style="color: #aaa; font-size: 13px;">Eşleşen Türkçe ve İspanyolca kelimeleri bul!</p>
-        <div class="grid-avi" id="alanAvi"></div>
-    </div>
-
-    <div id="ekranZamanaKarsi" class="ekran">
-        <div class="soru-kutusu">
-            <div id="zkSoru" class="soru-kelime">---</div>
-            <div class="sure-bar-bg"><div id="zkSure" class="sure-bar"></div></div>
+    <!-- 1. SEKME: HARİTA VE İLERLEME -->
+    <div id="map" class="content active">
+        <h3>📍 İspanya Fetih Durumu</h3>
+        
+        <div class="map-card">
+            <h4>🌴 1. Bölge: Andalucía (Endülüs)</h4>
+            <p>Durum: 🔥 FETHEDİLDİ</p>
+            <button class="btn" onclick="actionHaritaAtla(1)">Buraya Işınlan</button>
         </div>
-        <button class="sik-btn" id="zkSikA" onclick="zkCevapVer(0)"></button>
-        <button class="sik-btn" id="zkSikB" onclick="zkCevapVer(1)"></button>
-    </div>
 
-    <div id="ekranHafiza" class="ekran">
-        <p style="color: #aaa; font-size: 13px;">Kelimelerin arkasını açarak eşlerini bul!</p>
-        <div class="grid-hafiza" id="alanHafiza"></div>
-    </div>
-
-    <div id="ekranDogruYanlis" class="ekran">
-        <p style="color: #aaa; font-size: 13px;">Verilen eşleştirme doğru mu, yanlış mı?</p>
-        <div class="soru-kutusu">
-            <div id="tfEsp" class="soru-kelime">---</div>
-            <div class="tf-eslesme">⬇️</div>
-            <div id="tfTr" class="soru-kelime" style="color: #ffca28;">---</div>
+        <div class="map-card locked">
+            <h4>🎭 2. Bölge: Cataluña (Katalonya)</h4>
+            <p>Gereken: Kelime Avında 1,000 Skor</p>
+            <button class="btn" onclick="actionHaritaAtla(2)">Bölgeyi Keşfet & Fethet</button>
         </div>
-        <div class="btn-grup">
-            <button class="tf-btn btn-dogru" onclick="tfCevapVer(true)">✔️ DOĞRU</button>
-            <button class="tf-btn btn-yanlis" onclick="tfCevapVer(false)">❌ YANLIŞ</button>
+
+        <div class="map-card locked">
+            <h4>👑 3. Bölge: Madrid (Kraliyet Sarayı)</h4>
+            <p>Gereken: Kelime Avında 5,000 Skor</p>
+            <button class="btn" onclick="actionHaritaAtla(3)">Saray Kapısını Zorla</button>
         </div>
     </div>
 
-    <br><br>
-    <button class="bitir-btn" onclick="skoruBotaGonder()">Skorları Hesabıma Yükle 🚀</button>
+    <!-- 2. SEKME: KELİME AVI OYUNU -->
+    <div id="game" class="content">
+        <h3>⚔️ Kelime Avı Arenası</h3>
+        <p>İspanyolca kelimeleri bil, Metaverse enerjini (XP) katla!</p>
+        
+        <div style="background: #1e1e1e; padding: 30px; border-radius: 10px; font-size: 24px; font-weight: bold; margin: 20px 0;">
+            "GRACIAS" <br>
+            <span style="font-size: 14px; color: #aaa;">Anlamı nedir?</span>
+        </div>
+        
+        <input type="text" id="gameAnswer" placeholder="Cevabınızı buraya yazın...">
+        <!-- Gerçek skoru simüle etmek için doğrudan 1500 puan fırlatan buton -->
+        <button class="btn" onclick="actionSkorGonder(1500)">Doğru Cevap (+1500 XP Kazan)</button>
+    </div>
 
+    <!-- 3. SEKME: KLAN VE SARAY DİPLOMASİSİ -->
+    <div id="clan" class="content">
+        <h3>🏰 Metaverse Birlik Yönetimi</h3>
+        
+        <div class="map-card">
+            <h4>🛡️ Yeni Bir Klan Kur</h4>
+            <p>Maliyet: 1000 XP (Klan gücünü birleştirip bölgeleri ele geçir!)</p>
+            <input type="text" id="clanName" placeholder="Klan Adını Girin...">
+            <button class="btn" onclick="actionKlanKur()">Klan Sancağını Dik</button>
+        </div>
+
+        <div class="map-card">
+            <h4>🦅 Kraliyet Sarayına Elçi Gönder</h4>
+            <p>Madrid Sarayı'nda elçiniz kaldıkça klan nüfuzunuz artar.</p>
+            <button class="btn" style="background: #ff3333; color: white;" onclick="actionElciGonder()">Saray Elçisini Uçur</button>
+        </div>
+    </div>
+
+    <!-- 💡 TELEGRAM Bİ-DIRECTIONAL JSON MOTORU (JAVASCRIPT) 💡 -->
     <script>
-        const tg = window.Telegram.WebApp; tg.expand();
-        let toplamSkor = 0;
+        // Telegram Web App nesnesini başlat ve ekranı kapla
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-        // DEV KELİME HAVUZU
-        const kelimeHavuzu = [
-            { esp: "¡Hola!", tr: "Merhaba" }, { esp: "Gracias", tr: "Teşekkürler" },
-            { esp: "Buenos días", tr: "Günaydın" }, { esp: "Buenas noches", tr: "İyi geceler" },
-            { esp: "Madre", tr: "Anne" }, { esp: "Padre", tr: "Baba" },
-            { esp: "Uno", tr: "Bir" }, { esp: "Cinco", tr: "Beş" },
-            { esp: "Diez", tr: "On" }, { esp: "Te amo", tr: "Seni seviyorum" },
-            { esp: "Mi amor", tr: "Aşkım" }, { esp: "Te extraño", tr: "Seni özlüyorum" },
-            { esp: "Hablar", tr: "Konuşmak" }, { esp: "Comer", tr: "Yemek yemek" },
-            { esp: "Grande", tr: "Büyük" }, { esp: "Pequeño", tr: "Küçük" },
-            { esp: "Por favor", tr: "Lütfen" }, { esp: "De nada", tr: "Rica ederim" }
-        ];
-
-        function skoruGuncelle(puan) {
-            toplamSkor += puan;
-            document.getElementById("genelSkor").innerText = toplamSkor;
-        }
-
-        function ekranDegistir(ekranAdi, btn) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('aktif'));
-            document.querySelectorAll('.ekran').forEach(e => e.classList.remove('aktif'));
-            btn.classList.add('aktif');
+        // Sekme Değiştirme Fonksiyonu
+        function switchTab(tabId) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             
-            clearInterval(zkZamanlayici); // Başka ekrana geçince zamanlayıcıyı durdur
-
-            if(ekranAdi === 'avi') { document.getElementById('ekranAvi').classList.add('aktif'); aviKur(); }
-            if(ekranAdi === 'zamana_karsi') { document.getElementById('ekranZamanaKarsi').classList.add('aktif'); zkBaslat(); }
-            if(ekranAdi === 'hafiza') { document.getElementById('ekranHafiza').classList.add('aktif'); hafizaKur(); }
-            if(ekranAdi === 'dogru_yanlis') { document.getElementById('ekranDogruYanlis').classList.add('aktif'); tfBaslat(); }
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
-        // ================= OYUN 1: KELİME AVI =================
-        let aviSecilenler = [], aviEslesenler = 0;
-        function aviKur() {
-            const alan = document.getElementById("alanAvi"); alan.innerHTML = "";
-            aviSecilenler = []; aviEslesenler = 0;
-            let list = [...kelimeHavuzu].sort(() => Math.random() - 0.5).slice(0, 5);
-            let kartlar = [];
-            list.forEach((k, i) => {
-                kartlar.push({ text: k.esp, type: 'esp', id: i });
-                kartlar.push({ text: k.tr, type: 'tr', id: i });
-            });
-            kartlar.sort(() => Math.random() - 0.5);
-            kartlar.forEach(k => {
-                const div = document.createElement("div"); div.className = "kart"; div.innerText = k.text;
-                div.dataset.id = k.id; div.dataset.type = k.type;
-                div.onclick = () => {
-                    if(div.classList.contains('dogru') || div.classList.contains('secili')) return;
-                    div.classList.add('secili'); aviSecilenler.push(div);
-                    if(aviSecilenler.length === 2) {
-                        let k1 = aviSecilenler[0], k2 = aviSecilenler[1];
-                        if(k1.dataset.id === k2.dataset.id && k1.dataset.type !== k2.dataset.type) {
-                            k1.className = "kart dogru"; k2.className = "kart dogru";
-                            skoruGuncelle(50); aviEslesenler++;
-                            confetti({ particleCount: 20, spread: 30, origin: { y: 0.8 } });
-                            if(aviEslesenler === 5) büyükKonfeti();
-                        } else {
-                            setTimeout(() => { k1.remove('secili'); k2.remove('secili'); }, 400);
-                        }
-                        aviSecilenler = [];
-                    }
-                };
-                alan.appendChild(div);
-            });
+        // 🎯 1. SKORU BOTA JSON OLARAK FIRLATAN MOTOR
+        function actionSkorGonder(puan) {
+            let veri = {
+                action: "skor_kaydet",
+                score: puan
+            };
+            // JSON verisini arka plandaki Python botuna gönderir ve Web App'i kapatır
+            tg.sendData(JSON.stringify(veri));
         }
 
-        // ================= OYUN 2: ZAMANA KARŞI =================
-        let zkZamanlayici, zkDogruCevap, zkSureSol;
-        function zkBaslat() {
-            clearInterval(zkZamanlayici);
-            let soru = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)];
-            document.getElementById("zkSoru").innerText = soru.esp;
-            
-            let yanlisSoru = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)];
-            while(yanlisSoru.tr === soru.tr) { yanlisSoru = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)]; }
-
-            let rand = Math.random() > 0.5;
-            document.getElementById("zkSikA").innerText = rand ? soru.tr : yanlisSoru.tr;
-            document.getElementById("zkSikB").innerText = rand ? yanlisSoru.tr : soru.tr;
-            zkDogruCevap = rand ? 0 : 1;
-
-            zkSureSol = 100;
-            zkZamanlayici = setInterval(() => {
-                zkSureSol -= 3.5; // Hız barı
-                document.getElementById("zkSure").style.width = zkSureSol + "%";
-                if(zkSureSol <= 0) { clearInterval(zkZamanlayici); zkBaslat(); }
-            }, 100);
+        // 🎯 2. HARİTA FETİH VERİSİNİ BOTA JSON OLARAK FIRLATAN MOTOR
+        function actionHaritaAtla(haritaId) {
+            let veri = {
+                action: "harita_atla",
+                harita_id: haritaId
+            };
+            tg.sendData(JSON.stringify(veri));
         }
-        function zkCevapVer(secim) {
-            clearInterval(zkZamanlayici);
-            if(secim === zkDogruCevap) {
-                skoruGuncelle(40);
-                confetti({ particleCount: 20, colors: ['#00d2ff', '#fff'] });
+
+        // 🎯 3. KLAN KURMA VERİSİNİ BOTA JSON OLARAK FIRLATAN MOTOR
+        function actionKlanKur() {
+            let klanIsmi = document.getElementById('clanName').value;
+            if(!klanIsmi) {
+                alert("Önce bir klan ismi yazmalısın kral!");
+                return;
             }
-            zkBaslat();
+            let veri = {
+                action: "klan_kur",
+                klan_adi: klanIsmi
+            };
+            tg.sendData(JSON.stringify(veri));
         }
 
-        // ================= OYUN 3: HAFIZA KARTLARI =================
-        let hafizaSecilenler = [], hafizaEslesenler = 0;
-        function hafizaKur() {
-            const alan = document.getElementById("alanHafiza"); alan.innerHTML = "";
-            hafizaSecilenler = []; hafizaEslesenler = 0;
-            let list = [...kelimeHavuzu].sort(() => Math.random() - 0.5).slice(0, 4);
-            let kartlar = [];
-            list.forEach((k, i) => {
-                kartlar.push({ text: k.esp, id: i }); kartlar.push({ text: k.tr, id: i });
-            });
-            kartlar.sort(() => Math.random() - 0.5);
-            kartlar.forEach(k => {
-                const div = document.createElement("div"); div.className = "hafiza-kart"; div.innerText = k.text;
-                div.dataset.id = k.id;
-                div.onclick = () => {
-                    if(div.classList.contains('acik') || div.classList.contains('eslesmis') || hafizaSecilenler.length >= 2) return;
-                    div.classList.add('acik'); hafizaSecilenler.push(div);
-                    if(hafizaSecilenler.length === 2) {
-                        let h1 = hafizaSecilenler[0], h2 = hafizaSecilenler[1];
-                        if(h1.dataset.id === h2.dataset.id) {
-                            setTimeout(() => {
-                                h1.className = "hafiza-kart eslesmis"; h2.className = "hafiza-kart eslesmis";
-                                skoruGuncelle(60); hafizaEslesenler++;
-                                confetti({ particleCount: 25, spread: 40 });
-                                if(hafizaEslesenler === 4) büyükKonfeti();
-                            }, 300);
-                        } else {
-                            setTimeout(() => { h1.classList.remove('acik'); h2.classList.remove('acik'); }, 800);
-                        }
-                        setTimeout(() => { hafizaSecilenler = []; }, 850);
-                    }
-                };
-                alan.appendChild(div);
-            });
+        // 🎯 4. ELÇİ GÖNDERME VERİSİNİ BOTA JSON OLARAK FIRLATAN MOTOR
+        function actionElciGonder() {
+            let veri = {
+                action: "elci_gonder"
+            };
+            tg.sendData(JSON.stringify(veri));
         }
-
-        // ================= OYUN 4: DOĞRU MU YANLIŞ MI =================
-        let tfGercekDurum = false;
-        function tfBaslat() {
-            let anaKelime = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)];
-            document.getElementById("tfEsp").innerText = anaKelime.esp;
-
-            let rastgeleSecim = Math.random() > 0.5;
-            if(rastgeleSecim) {
-                // Doğru eşleştirme ver
-                document.getElementById("tfTr").innerText = anaKelime.tr;
-                tfGercekDurum = true;
-            } else {
-                // Yanlış eşleştirme ver
-                let yanlisKelime = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)];
-                while(yanlisKelime.tr === anaKelime.tr) { yanlisKelime = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)]; }
-                document.getElementById("tfTr").innerText = yanlisKelime.tr;
-                tfGercekDurum = false;
-            }
-        }
-        function tfCevapVer(kullaniciSecimi) {
-            if(kullaniciSecimi === tfGercekDurum) {
-                skoruGuncelle(30);
-                confetti({ particleCount: 15, colors: ['#2ecc71', '#ffca28'] });
-            }
-            tfBaslat();
-        }
-
-        // ================= ORTAK BÜYÜK ŞOV EFEKTİ =================
-        function büyükKonfeti() {
-            var end = Date.now() + 2 * 1000;
-            (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0, y: 0.7 } });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1, y: 0.7 } });
-                if (Date.now() < end) requestAnimationFrame(frame);
-            }());
-        }
-
-        function skoruBotaGonder() {
-            clearInterval(zkZamanlayici);
-            if (tg.sendData) { tg.sendData(toplamSkor.toString()); } 
-            else { alert("Toplam Skor: " + toplamSkor + " XP!"); }
-            tg.close();
-        }
-
-        // İlk oyunla start ver
-        aviKur();
     </script>
 </body>
 </html>
