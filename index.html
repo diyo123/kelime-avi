@@ -63,11 +63,9 @@
     <button class="bitir-btn" id="bitirBtn" onclick="skoruBotaGonder()">Skorları Hesabıma Yükle 🏆</button>
 
     <script>
-        // Telegram Web App'i başlatıyoruz
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Ekranı tam boy yap
+        tg.expand(); 
 
-        // Örnek Kelime Havuzu (Hangi modülden gelindiğine göre dinamik de yapılabilir)
         const kelimeler = [
             { esp: "¡Hola!", tr: "Merhaba" },
             { esp: "Gracias", tr: "Teşekkürler" },
@@ -79,7 +77,6 @@
         let secilenKartlar = [];
         let eslesenSayisi = 0;
 
-        // Oyun tahtasını hazırla
         function oyunuKur() {
             let kartHavuzu = [];
             kelimeler.forEach((k, index) => {
@@ -87,7 +84,6 @@
                 kartHavuzu.push({ text: k.tr, type: 'tr', id: index });
             });
 
-            // Kartları karıştır
             kartHavuzu.sort(() => Math.random() - 0.5);
 
             const alan = document.getElementById("oyunAlani");
@@ -112,11 +108,10 @@
                 const k1 = secilenKartlar[0];
                 const k2 = secilenKartlar[1];
 
-                // Eğer ID'leri aynı ama tipleri farklıysa DOĞRU EŞLEŞMEDİR
                 if (k1.dataset.id === k2.dataset.id && k1.dataset.type !== k2.dataset.type) {
                     k1.className = "kart dogru";
                     k2.className = "kart dogru";
-                    toplamSkor += 25; // Her doğru eşleşme 25 XP
+                    toplamSkor += 25; 
                     document.getElementById("skor").innerText = toplamSkor;
                     eslesenSayisi++;
 
@@ -124,7 +119,6 @@
                         document.getElementById("bitirBtn").style.display = "inline-block";
                     }
                 } else {
-                    // Yanlışsa 1 saniye sonra renkleri sıfırla
                     setTimeout(() => {
                         k1.classList.remove('secili');
                         k2.classList.remove('secili');
@@ -134,12 +128,17 @@
             }
         }
 
-        // İŞTE SİHİRLİ NOKTA: Kazanılan skoru Telegram botuna fırlatan fonksiyon
+        // YENİ GÜVENLİ VERİ GÖNDERME METODU
         function skoruBotaGonder() {
-            tg.sendData(toplamSkor.toString()); // Veriyi bota gönderir ve Web App ekranını kapatır
+            // Eğer tg.sendData çalışmazsa alternatif olarak Telegram arayüzüne mesaj yazdırır
+            if (tg.sendData) {
+                tg.sendData(toplamSkor.toString());
+            } else {
+                alert("Skorunuz: " + toplamSkor + " XP! Lütfen pencereyi kapatıp bota dönün.");
+            }
+            tg.close(); // Oyunu otomatik kapatır
         }
 
-        // Oyunu başlat
         oyunuKur();
     </script>
 </body>
