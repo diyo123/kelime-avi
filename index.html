@@ -1,31 +1,48 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8"><title>Hardcore İspanyolca</title>
+    <meta charset="UTF-8"><title>İspanyolca Akademisi</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #0f0f12; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
-        .card { background: #1a1a24; padding: 20px; border-radius: 15px; margin: 10px; border: 2px solid #ffcc00; }
-        .btn { background: #ffcc00; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; }
+        body { background: #0f0f12; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
+        .card { background: #1a1a24; padding: 20px; border-radius: 15px; border: 2px solid #ffcc00; }
+        .btn { background: #ffcc00; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="card" id="egitim-ekrani">
-        <h2 id="konuBaslik">Andalucía: Temel Selamlaşma</h2>
-        <p id="dersIcerik">"Hola" = Merhaba, "Gracias" = Teşekkürler.</p>
-        <input type="text" id="cevap" placeholder="Gracias ne demek?" style="padding:10px; width:80%;">
-        <button class="btn" onclick="kontrolEt()">Sınavı Tamamla</button>
+    <div class="card" id="egitim">
+        <h2 id="unite">Ünite 1: Andalucía</h2>
+        <p id="ders">Konu: Alfabe ve Sayılar. "Uno" = 1, "Rojo" = Kırmızı.</p>
+        <p id="hikaye">Hikaye: Endülüs'te kayıp bir anahtar arıyorsun...</p>
+        <input type="text" id="cevap" placeholder="Cevabını yaz..." style="width:90%; padding:10px;">
+        <button class="btn" onclick="kontrol()">Sınavı Tamamla</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        function kontrolEt() {
-            let cvp = document.getElementById('cevap').value.toLowerCase();
-            if(cvp === "teşekkürler") {
-                alert("Doğru! Hardcore mod başarıyla tamamlandı.");
-                tg.sendData(JSON.stringify({action: "sinav_gecildi", skor: 500}));
+        let s = 0; // Seviye
+        const M = [
+            {u: "Andalucía", d: "Alfabeye Giriş", h: "Anahtarı bulmak için 'Rojo' (kırmızı) rengini bul.", s: "kırmızı"},
+            {u: "Murcia", d: "Temel Tanışma", h: "İspanyolca merhaba ne demek?", s: "hola"},
+            {u: "Valencia", d: "Lokantada Sipariş", h: "Lütfen (Please) nasıl denir?", s: "por favor"}
+        ];
+
+        function kontrol() {
+            let c = document.getElementById('cevap').value.toLowerCase();
+            if(c === M[s].s) {
+                alert("Başarılı! Bölge fethedildi.");
+                s++;
+                if(s < M.length) {
+                    document.getElementById('unite').innerText = "Ünite " + (s+1) + ": " + M[s].u;
+                    document.getElementById('ders').innerText = "Konu: " + M[s].d;
+                    document.getElementById('hikaye').innerText = M[s].h;
+                    document.getElementById('cevap').value = "";
+                } else {
+                    alert("TÜM İSPANYA'YI FETHETTİN!");
+                    tg.sendData(JSON.stringify({action: "bolge_atla", yeni_seviye: s}));
+                }
             } else {
-                alert("YANLIŞ! Tekrar oku kanka, İspanya'yı fethin yolu bilgiden geçer.");
+                alert("Yanlış! İspanyolca'yı hatasız öğrenmelisin.");
             }
         }
     </script>
