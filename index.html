@@ -4,219 +4,323 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diyar'ın İspanya Fetih Metaverse'ü</title>
-    <!-- Telegram Web App Resmi Kütüphanesi -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root {
+            --bg-color: #0f0f12;
+            --card-bg: #1a1a24;
+            --primary: #ffcc00;
+            --danger: #ff3b30;
+            --success: #34c759;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #121212;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-color);
             color: #ffffff;
             margin: 0;
             padding: 0;
-            text-align: center;
+            user-select: none;
         }
-        .header {
-            background: linear-gradient(135deg, #820000, #b30000);
-            padding: 20px;
-            font-size: 22px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        /* Sekme Menüsü */
-        .tabs {
-            display: flex;
-            background: #1e1e1e;
-            justify-content: space-around;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-        .tab-btn {
+        /* ÜST SABİT SKOR PANELİ */
+        .live-dashboard {
+            background: linear-gradient(135deg, #1e1e2f, #2d1b4e);
             padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-box span {
+            display: block;
+            font-size: 11px;
             color: #aaa;
-            background: none;
-            border: none;
+            text-transform: uppercase;
+        }
+        .stat-box gold {
             font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            transition: 0.3s;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* SEKMELER */
+        .tabs { display: flex; background: #161622; }
+        .tab-btn {
+            padding: 15px; color: #888; background: none; border: none;
+            font-size: 15px; cursor: pointer; width: 100%; transition: 0.3s;
         }
         .tab-btn.active {
-            color: #fff;
-            border-bottom: 3px solid #ffcc00;
-            background: #252525;
-            font-weight: bold;
+            color: #fff; border-bottom: 3px solid var(--primary);
+            background: rgba(255,255,0,0.05); font-weight: bold;
         }
-        .content {
-            padding: 20px;
-            display: none;
+
+        .content { padding: 20px; display: none; }
+        .content.active { display: block; }
+
+        /* 🗺️ GERÇEK İNTERAKTİF METAVERSE HARİTASI */
+        .spain-map-container {
+            background: #1c1c28;
+            border: 2px solid #333;
+            border-radius: 15px;
+            height: 320px;
+            margin: 20px auto;
+            max-width: 450px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            overflow: hidden;
         }
-        .content.active {
-            display: block;
-        }
-        /* Harita Tasarımı */
-        .map-card {
-            background: #1e1e1e;
-            margin: 15px auto;
-            padding: 20px;
+        .map-region {
+            position: absolute;
+            padding: 15px;
             border-radius: 10px;
-            max-width: 400px;
-            border-left: 5px solid #ffcc00;
-            text-align: left;
-        }
-        .map-card.locked {
-            border-left: 5px solid #555;
-            opacity: 0.6;
-        }
-        /* Butonlar */
-        .btn {
-            background: #ffcc00;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
             font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            width: 100%;
-            transition: 0.2s;
+            font-size: 14px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            transition: all 0.5s ease;
         }
-        .btn:hover { background: #e6b800; }
-        .btn-locked { background: #444; color: #888; cursor: not-allowed; }
+        /* Bölgelerin Harita Üzerindeki Gerçek Koordinatları */
+        #region-andalucia {
+            bottom: 20px; left: 25%; width: 45%;
+            background: linear-gradient(135deg, #1b4d3e, #2e7d32);
+            border: 2px solid var(--success);
+        }
+        #region-cataluna {
+            top: 50px; right: 15px; width: 35%;
+            background: #2c2c35; border: 2px solid #555; color: #777;
+        }
+        #region-madrid {
+            top: 130px; left: 35%; width: 30%;
+            background: #2c2c35; border: 2px solid #555; color: #777;
+        }
         
+        /* Haritalar Açıldığında Devreye Girecek Işıltılı Efektler */
+        .region-unlocked {
+            background: linear-gradient(135deg, #820000, #b30000) !important;
+            border: 2px solid var(--primary) !important;
+            color: #fff !important;
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* 📍 OYUNCU CANLI KONUM PİYONU */
+        .player-pawn {
+            position: absolute;
+            background: var(--primary);
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 0 15px var(--primary);
+            border: 2px solid #fff;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px rgba(255,204,0,0.4); }
+            50% { box-shadow: 0 0 20px rgba(255,204,0,0.8); }
+            100% { box-shadow: 0 0 5px rgba(255,204,0,0.4); }
+        }
+
+        /* KELİME SAVAŞI ARENASI */
+        .arena-box {
+            background: #222232; padding: 40px 20px; border-radius: 15px;
+            border: 2px solid #333; margin: 20px 0;
+        }
+        .word-display {
+            font-size: 32px; font-weight: bold; letter-spacing: 2px;
+            color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+        .score-counter { font-size: 40px; font-weight: bold; color: var(--success); margin-bottom: 10px; }
+
         input {
-            width: 90%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #444;
-            background: #222;
-            color: #fff;
-            font-size: 16px;
+            width: 85%; padding: 12px; border-radius: 8px; border: 2px solid #444;
+            background: #111; color: #fff; font-size: 18px; text-align: center; margin-bottom: 15px;
+        }
+        input:focus { border-color: var(--primary); outline: none; }
+        .btn {
+            background: linear-gradient(135deg, #ffcc00, #ffaa00); color: #000; border: none;
+            padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 8px;
+            cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(255,204,0,0.3);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff3b30, #cc241d); color: #fff;
+            box-shadow: 0 4px 10px rgba(255,59,48,0.3); margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">🌍 DİYAR'IN METAVERSE EVRENİ</div>
+    <div class="live-dashboard">
+        <div class="stat-box">
+            <span>Savaş Skorun</span>
+            <gold id="liveScore">0</gold>
+        </div>
+        <div class="stat-box">
+            <span>Mevcut Alan</span>
+            <gold id="liveRegionName">Andalucía</gold>
+        </div>
+        <div class="stat-box">
+            <span>Klan Gücü</span>
+            <gold id="liveClanPower">1,500 💪</gold>
+        </div>
+    </div>
 
-    <!-- ALT SEKMELER -->
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('map')">🗺️ Harita</button>
-        <button class="tab-btn" onclick="switchTab('game')">⚔️ Kelime Avı</button>
-        <button class="tab-btn" onclick="switchTab('clan')">🏰 Klan & Saray</button>
+        <button class="tab-btn active" id="tab-map" onclick="switchTab('map')">🗺️ Canlı Harita</button>
+        <button class="tab-btn" id="tab-game" onclick="switchTab('game')">⚔️ Kelime Savaşı</button>
+        <button class="tab-btn" id="tab-clan" onclick="switchTab('clan')">🏰 Klan & Sıralama</button>
     </div>
 
-    <!-- 1. SEKME: HARİTA VE İLERLEME -->
     <div id="map" class="content active">
-        <h3>📍 İspanya Fetih Durumu</h3>
+        <h3>🗺️ Stratejik İspanya Haritası</h3>
+        <p style="color:#aaa; font-size:13px; margin-top:-10px;">Skorunu yükselterek piyonunu yeni şehirlere ilerlet kral!</p>
         
-        <div class="map-card">
-            <h4>🌴 1. Bölge: Andalucía (Endülüs)</h4>
-            <p>Durum: 🔥 FETHEDİLDİ</p>
-            <button class="btn" onclick="actionHaritaAtla(1)">Buraya Işınlan</button>
+        <div class="spain-map-container">
+            <div class="player-pawn" id="playerPawn">📍 SEN</div>
+
+            <div class="map-region" id="region-andalucia">
+                🌴 Andalucía <br><span style="font-size:10px;">(Başlangıç)</span>
+            </div>
+
+            <div class="map-region" id="region-cataluna">
+                🎭 Cataluña <br><span style="font-size:10px;">(1,000 Skor)</span>
+            </div>
+
+            <div class="map-region" id="region-madrid">
+                👑 Madrid <br><span style="font-size:10px;">(5,000 Skor)</span>
+            </div>
         </div>
 
-        <div class="map-card locked">
-            <h4>🎭 2. Bölge: Cataluña (Katalonya)</h4>
-            <p>Gereken: Kelime Avında 1,000 Skor</p>
-            <button class="btn" onclick="actionHaritaAtla(2)">Bölgeyi Keşfet & Fethet</button>
-        </div>
-
-        <div class="map-card locked">
-            <h4>👑 3. Bölge: Madrid (Kraliyet Sarayı)</h4>
-            <p>Gereken: Kelime Avında 5,000 Skor</p>
-            <button class="btn" onclick="actionHaritaAtla(3)">Saray Kapısını Zorla</button>
-        </div>
+        <button class="btn" onclick="switchTab('game')">⚔️ Kelime Savaşına Gir ve Toprak Fethet</button>
     </div>
 
-    <!-- 2. SEKME: KELİME AVI OYUNU -->
     <div id="game" class="content">
-        <h3>⚔️ Kelime Avı Arenası</h3>
-        <p>İspanyolca kelimeleri bil, Metaverse enerjini (XP) katla!</p>
+        <div class="score-counter" id="arenaScore">0000</div>
+        <p style="color:#aaa; margin-top:-10px;">Bu Seferdeki Skorun</p>
         
-        <div style="background: #1e1e1e; padding: 30px; border-radius: 10px; font-size: 24px; font-weight: bold; margin: 20px 0;">
-            "GRACIAS" <br>
-            <span style="font-size: 14px; color: #aaa;">Anlamı nedir?</span>
+        <div class="arena-box">
+            <div class="word-display" id="targetWord">GRACIAS</div>
+            <p id="wordHint" style="color:var(--primary); font-size:14px;">İpucu: Teşekkürler</p>
         </div>
         
-        <input type="text" id="gameAnswer" placeholder="Cevabınızı buraya yazın...">
-        <!-- Gerçek skoru simüle etmek için doğrudan 1500 puan fırlatan buton -->
-        <button class="btn" onclick="actionSkorGonder(1500)">Doğru Cevap (+1500 XP Kazan)</button>
+        <input type="text" id="playerInput" placeholder="Anlamını yaz ve enterla..." onkeypress="handleKeyPress(event)">
+        <button class="btn" onclick="checkWordAnswer()">Saldır (Onayla)</button>
+        <button class="btn btn-danger" onclick="finishCampaign()">⚔️ Savaşı Bitir & Skorları Kaydet</button>
     </div>
 
-    <!-- 3. SEKME: KLAN VE SARAY DİPLOMASİSİ -->
     <div id="clan" class="content">
-        <h3>🏰 Metaverse Birlik Yönetimi</h3>
-        
-        <div class="map-card">
-            <h4>🛡️ Yeni Bir Klan Kur</h4>
-            <p>Maliyet: 1000 XP (Klan gücünü birleştirip bölgeleri ele geçir!)</p>
-            <input type="text" id="clanName" placeholder="Klan Adını Girin...">
-            <button class="btn" onclick="actionKlanKur()">Klan Sancağını Dik</button>
-        </div>
-
-        <div class="map-card">
-            <h4>🦅 Kraliyet Sarayına Elçi Gönder</h4>
-            <p>Madrid Sarayı'nda elçiniz kaldıkça klan nüfuzunuz artar.</p>
-            <button class="btn" style="background: #ff3333; color: white;" onclick="actionElciGonder()">Saray Elçisini Uçur</button>
+        <h3>🏰 Birlik & Krallık Gücü</h3>
+        <div class="meta-card">
+            <h4>🛡️ Yeni Bir Klan Birliği Kur</h4>
+            <input type="text" id="clanNameInput" placeholder="Klan adını yaz...">
+            <button class="btn" onclick="actionKlanKur()">Klan Sancağını Dik (-1000 XP)</button>
         </div>
     </div>
 
-    <!-- 💡 TELEGRAM Bİ-DIRECTIONAL JSON MOTORU (JAVASCRIPT) 💡 -->
     <script>
-        // Telegram Web App nesnesini başlat ve ekranı kapla
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Sekme Değiştirme Fonksiyonu
+        const KELİMELER = [
+            {w: "GRACIAS", h: "Teşekkürler", a: "teşekkürler"},
+            {w: "HOLA", h: "Selam / Merhaba", a: "merhaba"},
+            {w: "ADIOS", h: "Güle Güle / Hoşça kal", a: "güle güle"},
+            {w: "BUENOS DIAS", h: "Günaydın", a: "günaydın"},
+            {w: "POR FAVOR", h: "Lütfen", a: "lütfen"},
+            {w: "AMIGO", h: "Arkadaş / Dost", a: "arkadaş"}
+        ];
+
+        let mevcutKelimeIndex = 0;
+        let birikenSkor = 0;
+
         function switchTab(tabId) {
             document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+            
+            // Harita sekmesine her tıklandığında piyonu güncelle
+            if(tabId === 'map') { guncelleHaritaArayuzu(); }
         }
 
-        // 🎯 1. SKORU BOTA JSON OLARAK FIRLATAN MOTOR
-        function actionSkorGonder(puan) {
-            let veri = {
-                action: "skor_kaydet",
-                score: puan
-            };
-            // JSON verisini arka plandaki Python botuna gönderir ve Web App'i kapatır
-            tg.sendData(JSON.stringify(veri));
+        function sonrakiKelimeyiGetir() {
+            mevcutKelimeIndex = Math.floor(Math.random() * KELİMELER.length);
+            document.getElementById('targetWord').innerText = KELİMELER[mevcutKelimeIndex].w;
+            document.getElementById('wordHint').innerText = "İpucu: " + KELİMELER[mevcutKelimeIndex].h;
+            document.getElementById('playerInput').value = "";
         }
 
-        // 🎯 2. HARİTA FETİH VERİSİNİ BOTA JSON OLARAK FIRLATAN MOTOR
-        function actionHaritaAtla(haritaId) {
-            let veri = {
-                action: "harita_atla",
-                harita_id: haritaId
-            };
-            tg.sendData(JSON.stringify(veri));
-        }
-
-        // 🎯 3. KLAN KURMA VERİSİNİ BOTA JSON OLARAK FIRLATAN MOTOR
-        function actionKlanKur() {
-            let klanIsmi = document.getElementById('clanName').value;
-            if(!klanIsmi) {
-                alert("Önce bir klan ismi yazmalısın kral!");
-                return;
+        // 🚀 CANLI HARİTA VE PİYON HAREKET MOTORU
+        function guncelleHaritaArayuzu() {
+            const piyon = document.getElementById('playerPawn');
+            
+            if (birikenSkor >= 5000) {
+                // Oyuncu Madrid'e ulaştı
+                piyon.style.top = "115px";
+                piyon.style.left = "43%";
+                document.getElementById('region-cataluna').classList.add('region-unlocked');
+                document.getElementById('region-madrid').classList.add('region-unlocked');
+                document.getElementById('liveRegionName').innerText = "Madrid 👑";
+            } 
+            else if (birikenSkor >= 1000) {
+                // Oyuncu Katalonya'ya ulaştı
+                piyon.style.top = "35px";
+                piyon.style.right = "60px";
+                piyon.style.left = "auto"; // sol hizalamayı sıfırla
+                document.getElementById('region-cataluna').classList.add('region-unlocked');
+                document.getElementById('liveRegionName').innerText = "Cataluña 🎭";
+            } 
+            else {
+                // Oyuncu hala Endülüs'te
+                piyon.style.bottom = "65px";
+                piyon.style.left = "42%";
+                document.getElementById('liveRegionName').innerText = "Andalucía 🌴";
             }
-            let veri = {
-                action: "klan_kur",
-                klan_adi: klanIsmi
-            };
+        }
+
+        function checkWordAnswer() {
+            let uInput = document.getElementById('playerInput').value.toLowerCase().trim();
+            let dogruCevap = KELİMELER[mevcutKelimeIndex].a;
+
+            if (uInput === dogruCevap) {
+                birikenSkor += 250;
+                document.getElementById('arenaScore').innerText = birikenSkor;
+                document.getElementById('liveScore').innerText = birikenSkor;
+                sonrakiKelimeyiGetir();
+            } else {
+                alert("❌ Yanlış Cevap! Mücadeleye devam kral.");
+            }
+        }
+
+        function handleKeyPress(e) { if (e.key === 'Enter') { checkWordAnswer(); } }
+
+        function finishCampaign() {
+            if (birikenSkor === 0) return alert("Hiç puan kazanmadın kral!");
+            let veri = { action: "skor_kaydet", score: birikenSkor };
             tg.sendData(JSON.stringify(veri));
         }
 
-        // 🎯 4. ELÇİ GÖNDERME VERİSİNİ BOTA JSON OLARAK FIRLATAN MOTOR
-        function actionElciGonder() {
-            let veri = {
-                action: "elci_gonder"
-            };
+        function actionKlanKur() {
+            let kName = document.getElementById('clanNameInput').value;
+            if(!kName) return alert("Klan adı yaz kanka!");
+            let veri = { action: "klan_kur", klan_adi: kName };
             tg.sendData(JSON.stringify(veri));
         }
+
+        // İlk kurulum
+        sonrakiKelimeyiGetir();
+        setTimeout(guncelleHaritaArayuzu, 500); // Açılışta piyonu ilk yerine koy
     </script>
 </body>
 </html>
