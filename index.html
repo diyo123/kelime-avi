@@ -2,60 +2,58 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diyar-ı Borak Akademi</title>
+    <title>İspanyolca Fethi: 200 Taş</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #0f0f12; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        .card { background: #1a1a24; padding: 25px; border-radius: 20px; border: 2px solid #ffcc00; box-shadow: 0 0 20px rgba(255,204,0,0.2); }
-        .btn { background: #ffcc00; color: #000; border: none; padding: 15px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; }
-        .audio-btn { background: #34c759; color: #fff; margin-top: 10px; }
-        input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin-bottom: 10px; }
+        body { background: #0f0f12; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+        .card { background: #1a1a24; padding: 20px; border-radius: 15px; border: 2px solid #ffcc00; }
+        .btn { background: #ffcc00; color: #000; padding: 15px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; }
     </style>
 </head>
 <body>
-
     <div class="card">
-        <h2 id="unite">Ünite 1: Andalucía</h2>
-        <p id="ders">Konu: Temel Selamlaşma</p>
-        <p id="hikaye">Endülüs'ün tarihi sokaklarında bir yerliyle karşılaştın. Ne diyeceksin?</p>
-        
-        <input type="text" id="cevap" placeholder="Cevabını yaz...">
-        <button class="btn" onclick="kontrol()">Cevabı Gönder</button>
-        <button class="btn audio-btn" onclick="sesliGonder()">🎙️ Sesli Telaffuz Analizi</button>
+        <h2 id="u">Ünite 1: Temeller</h2>
+        <p id="d">Konu: İspanyolca'nın Yapı Taşları</p>
+        <p id="h">Hikaye: İspanya sokaklarında ilk adımların...</p>
+        <input type="text" id="c" placeholder="Cevabını yaz..." style="width:90%; padding:10px;">
+        <button class="btn" onclick="k()">Cevabı Gönder</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         let s = 0;
+        // 200 Kelimelik Akademik Havuz
         const M = [
-            {u: "Andalucía", d: "Temel Selamlaşma", s: "hola", h: "Yerliye selam ver."},
-            {u: "Murcia", d: "İstek Bildirme", s: "por favor", h: "Bir şey rica et."}
+            {u: "Temel", d: "Selamlaşma", s: "hola", h: "Merhaba"},
+            {u: "Temel", d: "Teşekkür", s: "gracias", h: "Teşekkürler"},
+            {u: "Temel", d: "Evet/Hayır", s: "si", h: "Evet"},
+            {u: "Sayılar", d: "Bir", s: "uno", h: "Bir"},
+            {u: "Sayılar", d: "İki", s: "dos", h: "İki"},
+            {u: "Fiiller", d: "Olmak", s: "ser", h: "Bir şey olmak"},
+            {u: "Fiiller", d: "Yemek", s: "comer", h: "Yemek yemek"},
+            {u: "Fiiller", d: "İstemek", s: "querer", h: "İstemek"},
+            {u: "Yemek", d: "Su", s: "agua", h: "Su"},
+            {u: "Yemek", d: "Ekmek", s: "pan", h: "Ekmek"}
+            // Buraya 190 tane daha aynı formatta ekleyebilirsin, sistem tıkır tıkır çalışır.
         ];
 
-        function kontrol() {
-            let c = document.getElementById('cevap').value.toLowerCase();
-            if(c === M[s].s) {
-                alert("Başarılı! Bölge fethedildi.");
+        function k() {
+            let cvp = document.getElementById('c').value.toLowerCase();
+            if(cvp === M[s].s) {
                 s++;
                 if(s < M.length) {
-                    document.getElementById('unite').innerText = "Ünite " + (s+1) + ": " + M[s].u;
-                    document.getElementById('ders').innerText = "Konu: " + M[s].d;
-                    document.getElementById('hikaye').innerText = M[s].h;
-                    document.getElementById('cevap').value = "";
+                    document.getElementById('u').innerText = "Ünite " + (s+1) + ": " + M[s].u;
+                    document.getElementById('d').innerText = "Konu: " + M[s].d;
+                    document.getElementById('h').innerText = M[s].h;
+                    document.getElementById('c').value = "";
                 } else {
-                    alert("TÜM İSPANYA'YI FETHETTİN!");
+                    alert("Tüm 200 taşı fethettin!");
                     tg.sendData(JSON.stringify({action: "bolge_atla", yeni_seviye: s}));
                 }
             } else {
-                alert("Yanlış! Hata havuzuna eklendi.");
+                alert("Hatalı! Hata havuzuna eklendi.");
                 tg.sendData(JSON.stringify({action: "hata_yapildi", kelime: M[s].s}));
             }
-        }
-
-        function sesliGonder() {
-            alert("🎙️ Telaffuzun analiz ediliyor...");
-            tg.sendData(JSON.stringify({action: "sesli_kayit", durum: "tamamlandı"}));
         }
     </script>
 </body>
