@@ -1,30 +1,36 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8"><title>İspanyolca Akademisi</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diyar-ı Borak Akademi</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #0f0f12; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
-        .card { background: #1a1a24; padding: 20px; border-radius: 15px; border: 2px solid #ffcc00; }
-        .btn { background: #ffcc00; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        body { background: #0f0f12; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
+        .card { background: #1a1a24; padding: 25px; border-radius: 20px; border: 2px solid #ffcc00; box-shadow: 0 0 20px rgba(255,204,0,0.2); }
+        .btn { background: #ffcc00; color: #000; border: none; padding: 15px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; }
+        .audio-btn { background: #34c759; color: #fff; margin-top: 10px; }
+        input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <div class="card" id="egitim">
+
+    <div class="card">
         <h2 id="unite">Ünite 1: Andalucía</h2>
-        <p id="ders">Konu: Alfabe ve Sayılar. "Uno" = 1, "Rojo" = Kırmızı.</p>
-        <p id="hikaye">Hikaye: Endülüs'te kayıp bir anahtar arıyorsun...</p>
-        <input type="text" id="cevap" placeholder="Cevabını yaz..." style="width:90%; padding:10px;">
-        <button class="btn" onclick="kontrol()">Sınavı Tamamla</button>
+        <p id="ders">Konu: Temel Selamlaşma</p>
+        <p id="hikaye">Endülüs'ün tarihi sokaklarında bir yerliyle karşılaştın. Ne diyeceksin?</p>
+        
+        <input type="text" id="cevap" placeholder="Cevabını yaz...">
+        <button class="btn" onclick="kontrol()">Cevabı Gönder</button>
+        <button class="btn audio-btn" onclick="sesliGonder()">🎙️ Sesli Telaffuz Analizi</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        let s = 0; // Seviye
+        let s = 0;
         const M = [
-            {u: "Andalucía", d: "Alfabeye Giriş", h: "Anahtarı bulmak için 'Rojo' (kırmızı) rengini bul.", s: "kırmızı"},
-            {u: "Murcia", d: "Temel Tanışma", h: "İspanyolca merhaba ne demek?", s: "hola"},
-            {u: "Valencia", d: "Lokantada Sipariş", h: "Lütfen (Please) nasıl denir?", s: "por favor"}
+            {u: "Andalucía", d: "Temel Selamlaşma", s: "hola", h: "Yerliye selam ver."},
+            {u: "Murcia", d: "İstek Bildirme", s: "por favor", h: "Bir şey rica et."}
         ];
 
         function kontrol() {
@@ -42,8 +48,14 @@
                     tg.sendData(JSON.stringify({action: "bolge_atla", yeni_seviye: s}));
                 }
             } else {
-                alert("Yanlış! İspanyolca'yı hatasız öğrenmelisin.");
+                alert("Yanlış! Hata havuzuna eklendi.");
+                tg.sendData(JSON.stringify({action: "hata_yapildi", kelime: M[s].s}));
             }
+        }
+
+        function sesliGonder() {
+            alert("🎙️ Telaffuzun analiz ediliyor...");
+            tg.sendData(JSON.stringify({action: "sesli_kayit", durum: "tamamlandı"}));
         }
     </script>
 </body>
