@@ -2,52 +2,145 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Diyar Borak Akademi</title>
-    <!-- Konfeti efekti için kütüphane -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Diyar-ı Borak İspanyolca Kelime Avı</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --bg: #f4f7f6; --accent: #2a9d8f; --text: #264653; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 20px; text-align: center; }
-        .card { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
-        .btn { background: var(--accent); color: white; padding: 12px 25px; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
-        input { padding: 12px; width: 80%; border: 2px solid #ddd; border-radius: 10px; margin-bottom: 20px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2f, #2d2d44);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+        h2 { color: #00d2ff; margin-bottom: 5px; }
+        .skor-tabela { font-size: 18px; margin-bottom: 20px; color: #ffca28; }
+        .oyun-alani {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .kart {
+            background: #3b3b58;
+            border: 2px solid #515175;
+            border-radius: 12px;
+            padding: 20px 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .kart:active { transform: scale(0.95); }
+        .secili { background: #00d2ff; color: #1e1e2f; border-color: #fff; }
+        .dogru { background: #2ecc71; border-color: #27ae60; opacity: 0.3; pointer-events: none; }
+        .bitir-btn {
+            margin-top: 30px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2 id="baslik">Ders Yükleniyor...</h2>
-        <p id="aciklama"></p>
-        <input type="text" id="cevap" placeholder="Cevabını buraya yaz...">
-        <br>
-        <button class="btn" onclick="kontrol()">Cevabı Gönder</button>
-    </div>
+
+    <h2>🎈 Kelime Avı Oyunu</h2>
+    <p style="color: #bbb; font-size: 14px;">Eşleşen Türkçe ve İspanyolca kelimelere sırasıyla tıkla!</p>
+    <div class="skor-tabela">Kazanılan Skor: <span id="skor">0</span> XP</div>
+
+    <div class="oyun-alani" id="oyunAlani"></div>
+
+    <button class="bitir-btn" id="bitirBtn" onclick="skoruBotaGonder()">Skorları Hesabıma Yükle 🏆</button>
 
     <script>
-        // Offline durum takibi
-        window.addEventListener('offline', () => alert("⚠️ İnternet yok, yerel verilerdesin!"));
+        // Telegram Web App'i başlatıyoruz
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Ekranı tam boy yap
 
-        const dersler = [
-            {u: "Ünite 1: Alfabe", d: "İspanyolca'da 'Hola' ile selamlaşılır.", c: "hola"},
-            {u: "Ünite 2: Sayılar", d: "1'den 3'e: Uno, Dos, Tres.", c: "tres"}
+        // Örnek Kelime Havuzu (Hangi modülden gelindiğine göre dinamik de yapılabilir)
+        const kelimeler = [
+            { esp: "¡Hola!", tr: "Merhaba" },
+            { esp: "Gracias", tr: "Teşekkürler" },
+            { esp: "Madre", tr: "Anne" },
+            { esp: "Padre", tr: "Baba" }
         ];
-        
-        let sira = 0;
-        function guncelle() {
-            document.getElementById('baslik').innerText = dersler[sira].u;
-            document.getElementById('aciklama').innerText = dersler[sira].d;
+
+        let toplamSkor = 0;
+        let secilenKartlar = [];
+        let eslesenSayisi = 0;
+
+        // Oyun tahtasını hazırla
+        function oyunuKur() {
+            let kartHavuzu = [];
+            kelimeler.forEach((k, index) => {
+                kartHavuzu.push({ text: k.esp, type: 'esp', id: index });
+                kartHavuzu.push({ text: k.tr, type: 'tr', id: index });
+            });
+
+            // Kartları karıştır
+            kartHavuzu.sort(() => Math.random() - 0.5);
+
+            const alan = document.getElementById("oyunAlani");
+            kartHavuzu.forEach(k => {
+                const div = document.createElement("div");
+                div.className = "kart";
+                div.innerText = k.text;
+                div.dataset.id = k.id;
+                div.dataset.type = k.type;
+                div.onclick = () => kartSec(div);
+                alan.appendChild(div);
+            });
         }
 
-        function kontrol() {
-            let giris = document.getElementById('cevap').value.toLowerCase();
-            if(giris === dersler[sira].c) {
-                // KONFETİ EFEKTİ
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                alert("Tebrikler kanka, bir ünite daha bitti!");
-                sira++;
-                if(sira < dersler.length) { guncelle(); } else { alert("Tüm üniteleri bitirdin, şampiyon!"); }
-            } else { alert("Olmadı kanka, pes etmek yok!"); }
+        function kartSec(element) {
+            if (element.classList.contains('dogru') || element.classList.contains('secili')) return;
+
+            element.classList.add('secili');
+            secilenKartlar.push(element);
+
+            if (secilenKartlar.length === 2) {
+                const k1 = secilenKartlar[0];
+                const k2 = secilenKartlar[1];
+
+                // Eğer ID'leri aynı ama tipleri farklıysa DOĞRU EŞLEŞMEDİR
+                if (k1.dataset.id === k2.dataset.id && k1.dataset.type !== k2.dataset.type) {
+                    k1.className = "kart dogru";
+                    k2.className = "kart dogru";
+                    toplamSkor += 25; // Her doğru eşleşme 25 XP
+                    document.getElementById("skor").innerText = toplamSkor;
+                    eslesenSayisi++;
+
+                    if (eslesenSayisi === kelimeler.length) {
+                        document.getElementById("bitirBtn").style.display = "inline-block";
+                    }
+                } else {
+                    // Yanlışsa 1 saniye sonra renkleri sıfırla
+                    setTimeout(() => {
+                        k1.classList.remove('secili');
+                        k2.classList.remove('secili');
+                    }, 400);
+                }
+                secilenKartlar = [];
+            }
         }
-        guncelle();
+
+        // İŞTE SİHİRLİ NOKTA: Kazanılan skoru Telegram botuna fırlatan fonksiyon
+        function skoruBotaGonder() {
+            tg.sendData(toplamSkor.toString()); // Veriyi bota gönderir ve Web App ekranını kapatır
+        }
+
+        // Oyunu başlat
+        oyunuKur();
     </script>
 </body>
 </html>

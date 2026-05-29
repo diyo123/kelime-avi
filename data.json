@@ -1,0 +1,12 @@
+{
+  "alfabe": {
+    "icerik": "İspanyolca alfabesi 27 harften oluşur. 'ñ' harfi özeldir, 'ny' diye okunur.",
+    "soru": "İspanyolca özel 'ñ' harfi nasıl okunur?",
+    "cevap": "ny"
+  },
+  "sayilar": {
+    "icerik": "1: Uno, 2: Dos, 3: Tres.",
+    "soru": "İspanyolca 3 nedir?",
+    "cevap": "tres"
+  }
+}
