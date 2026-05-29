@@ -2,47 +2,63 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>İspanyolca Akademisi</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>body { background: #121212; color: white; text-align: center; font-family: sans-serif; padding: 20px; }</style>
+    <title>Diyar Borak Akademi</title>
+    <style>
+        body { background: #0f0f12; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
+        .card { background: #1a1a24; padding: 25px; border-radius: 20px; border: 2px solid #ffcc00; }
+        .btn { background: #ffcc00; color: #000; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
+    </style>
 </head>
 <body>
-    <div id="ders-alani">
-        <h2 id="baslik">Ders Başlıyor...</h2>
-        <p id="hikaye">Yükleniyor...</p>
-        <input type="text" id="cevap" placeholder="Cevabını yaz...">
-        <button onclick="kontrol()">Cevabı Gönder</button>
+    <div class="card">
+        <h2 id="baslik">Ders Yükleniyor...</h2>
+        <p id="ders" style="font-size: 1.2em;"></p>
+        <div id="kontrol-paneli">
+            <p id="soru"></p>
+            <input type="text" id="cevap" placeholder="Cevabını yaz...">
+            <br>
+            <button class="btn" onclick="kontrol()">Gönder</button>
+        </div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        const M = [
-            {d: "Selamlaşma", s: "hola", h: "İspanya'da birine selam vermek için ne dersin?"},
-            {d: "Teşekkür", s: "gracias", h: "Sana yardım ettiler, teşekkür et."},
-            {d: "Evet/Hayır", s: "si", h: "Bir şeye onay ver."},
-            {d: "Yemek", s: "pan", h: "Fransızların 'pain' dediği ekmeğe İspanyollar ne der?"},
-            {d: "İçecek", s: "agua", h: "Çok susadın, su iste."}
+        const mudredat = [
+            {u: "Ünite 1: Selamlaşma", d: "İspanyolca 'Hola' ile selam verilir. 'H' harfi okunmaz.", s: "İspanyolca 'Merhaba' nedir?", c: "hola"},
+            {u: "Ünite 2: Sayılar", d: "İspanyolca'da '1' sayısı 'Uno' olarak yazılır.", s: "İspanyolca '1' nedir?", c: "uno"},
+            {u: "Ünite 3: Renkler", d: "İspanyolca 'Kırmızı' rengine 'Rojo' denir.", s: "İspanyolca 'Kırmızı' nedir?", c: "rojo"}
         ];
-        let s = 0;
+        
+        let sira = 0;
 
-        function guncelle() {
-            document.getElementById('baslik').innerText = M[s].d;
-            document.getElementById('hikaye').innerText = M[s].h;
+        function dersiBaslat() {
+            document.getElementById('baslik').innerText = mudredat[sira].u;
+            document.getElementById('ders').innerText = mudredat[sira].d;
+            
+            // "Anladın mı?" diyalogu
+            let anladinMi = confirm("Ders notunu okudun mu? Devam etmek için 'Tamam', tekrar okumak için 'İptal'e bas.");
+            if(anladinMi) {
+                document.getElementById('soru').innerText = mudredat[sira].s;
+            } else {
+                alert("Dersi başa sarıyorum...");
+                dersiBaslat();
+            }
         }
 
         function kontrol() {
-            let val = document.getElementById('cevap').value.toLowerCase();
-            if(val === M[s].s) {
-                alert("Doğru! Bir sonraki seviyeye geçiyorsun.");
-                s++;
-                if(s < M.length) guncelle();
-                else alert("Bölüm Bitti!");
+            let giris = document.getElementById('cevap').value.toLowerCase();
+            if(giris === mudredat[sira].c) {
+                alert("Tebrikler! Sınıfı geçtin.");
+                sira++;
+                if(sira < mudredat.length) {
+                    document.getElementById('cevap').value = "";
+                    dersiBaslat();
+                } else { alert("Tüm üniteleri bitirdin, şampiyon!"); }
             } else {
-                tg.sendData(JSON.stringify({action: "hata_yapildi", kelime: M[s].s}));
-                alert("Yanlış! Bu kelimeyi öğrendiğine emin ol.");
+                alert("Yanlış! Dersi tekrar oku.");
+                dersiBaslat();
             }
         }
-        guncelle();
+        dersiBaslat();
     </script>
 </body>
 </html>
