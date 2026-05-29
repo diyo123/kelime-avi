@@ -1,99 +1,32 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diyar-ı Borak Metaverse</title>
+    <meta charset="UTF-8"><title>Hardcore İspanyolca</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --bg-color: #0f0f12; --primary: #ffcc00; --success: #34c759; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg-color); color: #fff; margin: 0; padding: 0; }
-        .live-dashboard { background: #1e1e2f; padding: 15px; display: flex; justify-content: space-around; border-bottom: 2px solid var(--primary); }
-        .content { padding: 20px; display: none; }
-        .content.active { display: block; }
-        .tab-btn { padding: 10px; background: none; border: none; color: #888; cursor: pointer; }
-        .tab-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
-        .meta-card { background: #1a1a24; padding: 15px; border-radius: 10px; margin: 10px 0; border: 1px solid #333; }
-        .btn { background: var(--primary); color: #000; border: none; padding: 10px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        input { width: 90%; padding: 10px; border-radius: 5px; border: none; margin-bottom: 10px; }
+        body { background: #0f0f12; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+        .card { background: #1a1a24; padding: 20px; border-radius: 15px; margin: 10px; border: 2px solid #ffcc00; }
+        .btn { background: #ffcc00; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-
-    <div class="live-dashboard">
-        <div><span>Skor:</span> <b id="liveScore">0</b></div>
-        <div><span>Klan Gücü:</span> <b id="liveClanPower">0</b></div>
-    </div>
-
-    <div style="display:flex; justify-content:center; padding:10px;">
-        <button class="tab-btn active" id="tab-map" onclick="switchTab('map')">🗺️ Harita</button>
-        <button class="tab-btn" id="tab-game" onclick="switchTab('game')">⚔️ Savaş</button>
-        <button class="tab-btn" id="tab-clan" onclick="switchTab('clan')">🏰 Klan</button>
-    </div>
-
-    <div id="map" class="content active">
-        <div class="meta-card">
-            <h4>🎁 Bölge Hazinesi (Şifreli)</h4>
-            <p id="hazine-info">Seviyeye özel şifreyi gir, hazineyi kap!</p>
-            <input type="text" id="hazineSifre" placeholder="Şifre nedir?">
-            <button class="btn" onclick="hazineAc()">Sandığı Aç</button>
-        </div>
-    </div>
-
-    <div id="game" class="content">
-        <div class="meta-card">
-            <h2 id="targetWord">HOLA</h2>
-            <input type="text" id="playerInput" placeholder="Anlamı nedir?">
-            <button class="btn" onclick="checkWordAnswer()">Cevapla</button>
-        </div>
-    </div>
-
-    <div id="clan" class="content">
-        <div class="meta-card">
-            <h4>Klan Adı: <span id="kadi">Yok</span></h4>
-            <button class="btn" onclick="actionKlanKur()">Yeni Klan Kur</button>
-        </div>
+    <div class="card" id="egitim-ekrani">
+        <h2 id="konuBaslik">Andalucía: Temel Selamlaşma</h2>
+        <p id="dersIcerik">"Hola" = Merhaba, "Gracias" = Teşekkürler.</p>
+        <input type="text" id="cevap" placeholder="Gracias ne demek?" style="padding:10px; width:80%;">
+        <button class="btn" onclick="kontrolEt()">Sınavı Tamamla</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        let birikenSkor = 0;
-        let zorluk = 1;
-
-        const HAZINELER = { 1: "andalucia2026", 2: "barcelona123", 3: "madridkral" };
-
-        function switchTab(t) {
-            document.querySelectorAll('.content').forEach(c => c.style.display = 'none');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(t).style.display = 'block';
-            document.getElementById('tab-'+t).classList.add('active');
-        }
-
-        function checkWordAnswer() {
-            let input = document.getElementById('playerInput').value.toLowerCase();
-            // Basit kontrol
-            birikenSkor += (250 * zorluk);
-            document.getElementById('liveScore').innerText = birikenSkor;
-            document.getElementById('liveClanPower').innerText = birikenSkor; // Klan gücü skorla senkronize
-            alert("Doğru! Skorun arttı.");
-        }
-
-        function hazineAc() {
-            let sifre = document.getElementById('hazineSifre').value;
-            if(sifre === HAZINELER[zorluk]) {
-                alert("🎉 HAZİNE AÇILDI! +2000 XP");
-                birikenSkor += 2000;
-                tg.sendData(JSON.stringify({action: "hazine_acildi", puan: 2000}));
+        function kontrolEt() {
+            let cvp = document.getElementById('cevap').value.toLowerCase();
+            if(cvp === "teşekkürler") {
+                alert("Doğru! Hardcore mod başarıyla tamamlandı.");
+                tg.sendData(JSON.stringify({action: "sinav_gecildi", skor: 500}));
             } else {
-                alert("❌ Şifre yanlış!");
+                alert("YANLIŞ! Tekrar oku kanka, İspanya'yı fethin yolu bilgiden geçer.");
             }
-        }
-
-        function actionKlanKur() {
-            let isim = prompt("Klan adını gir:");
-            if(isim) tg.sendData(JSON.stringify({action: "klan_kur", klan_adi: isim}));
         }
     </script>
 </body>
