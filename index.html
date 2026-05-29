@@ -3,275 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Diyar-ı Borak İspanyolca Akademi</title>
-    <!-- Telegram ve Konfetti Efekti İçin Gerekli Kütüphaneler -->
+    <title>Diyar-ı Borak Mega Oyun Akademisi</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #0f0c20, #15102a, #1f173d);
+            background: linear-gradient(135deg, #05040a, #0d0a1c, #140f2b);
             color: white;
             text-align: center;
             margin: 0;
-            padding: 15px;
+            padding: 10px;
             user-select: none;
             overflow-x: hidden;
         }
-        h2 { color: #00d2ff; font-size: 24px; text-shadow: 0 0 10px rgba(0,210,255,0.3); margin-bottom: 5px; }
-        .subtitle { color: #aaa; font-size: 13px; margin-bottom: 15px; }
+        h2 { color: #00d2ff; font-size: 22px; text-shadow: 0 0 10px rgba(0,210,255,0.4); margin: 5px 0; }
         
-        /* Mod Seçim Alanı */
-        .mod-secici {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 15px;
+        /* 4'lü Oyun Menüsü Sığdırma Ayarı */
+        .oyun-nav {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin: 12px 0;
         }
-        .mod-btn {
-            background: #251c4a;
-            border: 1px solid #433280;
-            color: #bbb;
-            padding: 8px 12px;
-            font-size: 12px;
+        .nav-btn {
+            background: #161030;
+            border: 1px solid #332766;
+            color: #aaa;
+            padding: 10px 5px;
+            font-size: 11px;
             font-weight: bold;
-            border-radius: 20px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
         }
-        .mod-btn.aktif {
+        .nav-btn.aktif {
             background: linear-gradient(45deg, #00d2ff, #0066ff);
             color: white;
             border: none;
-            box-shadow: 0 0 15px rgba(0,210,255,0.4);
+            box-shadow: 0 0 12px rgba(0,210,255,0.4);
         }
 
         .skor-tabela {
-            font-size: 18px;
-            margin: 15px 0;
+            font-size: 19px;
+            margin: 10px 0;
             color: #ffca28;
             font-weight: bold;
-            text-shadow: 0 0 8px rgba(255,202,40,0.2);
+            background: rgba(255, 202, 40, 0.1);
+            padding: 8px;
+            border-radius: 10px;
+            display: inline-block;
         }
 
-        /* Oyun Alanı */
-        .oyun-alani {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            max-width: 420px;
-            margin: 0 auto;
-        }
+        .ekran { display: none; max-width: 420px; margin: 0 auto; }
+        .ekran.aktif { display: block; }
+
+        /* OYUN 1: KELİME AVI */
+        .grid-avi { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .kart {
-            background: #1c153a;
-            border: 2px solid #322569;
-            border-radius: 14px;
-            padding: 22px 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            word-wrap: break-word;
+            background: #120d29; border: 2px solid #23194f; border-radius: 10px;
+            padding: 18px 5px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
         }
-        .kart:hover { border-color: #00d2ff; }
-        .secili {
-            background: linear-gradient(135deg, #00d2ff, #0066ff);
-            color: white;
-            border-color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,210,255,0.4);
+        .secili { background: linear-gradient(135deg, #00d2ff, #0066ff); border-color: #fff; }
+        .dogru { background: linear-gradient(135deg, #2ecc71, #27ae60) !important; opacity: 0.2; pointer-events: none; }
+
+        /* OYUN 2: ZAMANA KARŞI */
+        .soru-kutusu { background: #151033; border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #2e236e; }
+        .soru-kelime { font-size: 24px; font-weight: bold; color: #00d2ff; }
+        .sure-bar-bg { background: #1c1542; height: 8px; border-radius: 4px; margin-top: 15px; overflow: hidden; }
+        .sure-bar { background: #ff416c; width: 100%; height: 100%; transition: width 0.1s linear; }
+        .sik-btn {
+            background: #120d29; border: 2px solid #23194f; color: white; width: 100%;
+            padding: 14px; margin: 6px 0; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer;
         }
-        .dogru {
-            background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
-            border-color: #2ecc71 !important;
-            color: white !important;
-            animation: dogruAnimasyon 0.5s ease forwards;
+
+        /* OYUN 3: HAFIZA KARTLARI */
+        .grid-hafiza { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .hafiza-kart {
+            background: #23194f; border-radius: 8px; height: 75px; display: flex;
+            align-items: center; justify-content: center; font-size: 12px; font-weight: bold; cursor: pointer; color: transparent; transition: all 0.25s;
         }
-        
-        @keyframes dogruAnimasyon {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-            100% { transform: scale(1); opacity: 0.25; pointer-events: none; }
-        }
+        .hafiza-kart.acik { background: #151033; color: white; border: 2px solid #00d2ff; }
+        .hafiza-kart.eslesmis { background: #27ae60; color: white; opacity: 0.3; pointer-events: none; border: none; }
+
+        /* OYUN 4: DOĞRU MU YANLIŞ MI */
+        .tf-karsilastirma { font-size: 22px; margin: 20px 0; font-weight: bold; }
+        .tf-eslesme { color: #ffca28; font-size: 26px; margin: 10px 0; }
+        .btn-grup { display: flex; gap: 10px; }
+        .tf-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; color: white; }
+        .btn-dogru { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .btn-yanlis { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
         .bitir-btn {
-            margin-top: 25px;
-            background: linear-gradient(45deg, #ff416c, #ff4b2b);
-            color: white;
-            border: none;
-            padding: 14px 35px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            display: none;
-            box-shadow: 0 5px 20px rgba(255,75,43,0.4);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.04); }
-            100% { transform: scale(1); }
+            margin-top: 20px; background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white; border: none; padding: 14px 35px; font-size: 16px; font-weight: bold; border-radius: 30px; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255,75,43,0.4); width: 85%; max-width: 350px;
         }
     </style>
 </head>
 <body>
 
-    <h2>⚡ Diyar-ı Borak Akademi</h2>
-    <div class="subtitle">Modunu seç, kelimeleri eşleştir, skoru kap!</div>
-
-    <!-- 3 FARKLI OYUN SEÇENEĞİ (MODU) -->
-    <div class="mod-secici">
-        <button class="mod-btn aktif" onclick="modDegistir('kelime_avi', this)">🎈 Kelime Avı</button>
-        <button class="mod-btn" onclick="modDegistir('gunluk_konusma', this)">🏠 Günlük Konuşma</button>
-        <button class="mod-btn" onclick="modDegistir('ask_flort', this)">💞 Aşk & Flört</button>
+    <h2>⚡ Diyar-ı Borak Oyun Evreni</h2>
+    
+    <div class="oyun-nav">
+        <button class="nav-btn aktif" onclick="ekranDegistir('avi', this)">🎈 Kelime Avı</button>
+        <button class="nav-btn" onclick="ekranDegistir('zamana_karsi', this)">⚡ Zamana Karşı</button>
+        <button class="nav-btn" onclick="ekranDegistir('hafiza', this)">🎴 Hafıza Kartı</button>
+        <button class="nav-btn" onclick="ekranDegistir('dogru_yanlis', this)">❓ Doğru mu?</button>
     </div>
 
-    <div class="skor-tabela">🎁 Kazanılan Skor: <span id="skor">0</span> XP</div>
+    <div class="skor-tabela">🔥 Toplam Kazanılan Puan: <span id="genelSkor">0</span> XP</div>
 
-    <div class="oyun-alani" id="oyunAlani"></div>
+    <div id="ekranAvi" class="ekran aktif">
+        <p style="color: #aaa; font-size: 13px;">Eşleşen Türkçe ve İspanyolca kelimeleri bul!</p>
+        <div class="grid-avi" id="alanAvi"></div>
+    </div>
 
-    <button class="bitir-btn" id="bitirBtn" onclick="skoruBotaGonder()">Skorları Hesabıma Yükle 🏆</button>
+    <div id="ekranZamanaKarsi" class="ekran">
+        <div class="soru-kutusu">
+            <div id="zkSoru" class="soru-kelime">---</div>
+            <div class="sure-bar-bg"><div id="zkSure" class="sure-bar"></div></div>
+        </div>
+        <button class="sik-btn" id="zkSikA" onclick="zkCevapVer(0)"></button>
+        <button class="sik-btn" id="zkSikB" onclick="zkCevapVer(1)"></button>
+    </div>
+
+    <div id="ekranHafiza" class="ekran">
+        <p style="color: #aaa; font-size: 13px;">Kelimelerin arkasını açarak eşlerini bul!</p>
+        <div class="grid-hafiza" id="alanHafiza"></div>
+    </div>
+
+    <div id="ekranDogruYanlis" class="ekran">
+        <p style="color: #aaa; font-size: 13px;">Verilen eşleştirme doğru mu, yanlış mı?</p>
+        <div class="soru-kutusu">
+            <div id="tfEsp" class="soru-kelime">---</div>
+            <div class="tf-eslesme">⬇️</div>
+            <div id="tfTr" class="soru-kelime" style="color: #ffca28;">---</div>
+        </div>
+        <div class="btn-grup">
+            <button class="tf-btn btn-dogru" onclick="tfCevapVer(true)">✔️ DOĞRU</button>
+            <button class="tf-btn btn-yanlis" onclick="tfCevapVer(false)">❌ YANLIŞ</button>
+        </div>
+    </div>
+
+    <br><br>
+    <button class="bitir-btn" onclick="skoruBotaGonder()">Skorları Hesabıma Yükle 🚀</button>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand(); 
-
-        // GENİŞLETİLMİŞ VE ZENGİNLEŞTİRİLMİŞ KARŞILAŞTIRMA LİSTELERİ (HAVUZ)
-        const oyunVerileri = {
-            kelime_avi: [
-                { esp: "Uno", tr: "Bir (1)" },
-                { esp: "Cinco", tr: "Beş (5)" },
-                { esp: "Diez", tr: "On (10)" },
-                { esp: "Quince", tr: "On beş (15)" },
-                { esp: "Veinte", tr: "Yirmi (20)" },
-                { esp: "Cincuenta", tr: "Elli (50)" }
-            ],
-            gunluk_konusma: [
-                { esp: "¡Hola!", tr: "Merhaba" },
-                { esp: "Buenos días", tr: "Günaydın" },
-                { esp: "Buenas noches", tr: "İyi geceler" },
-                { esp: "Gracias", tr: "Teşekkürler" },
-                { esp: "Por favor", tr: "Lütfen" },
-                { esp: "De nada", tr: "Rica ederim" }
-            ],
-            ask_flort: [
-                { esp: "Te amo", tr: "Seni seviyorum" },
-                { esp: "Mi amor", tr: "Aşkım" },
-                { esp: "Mi vida", tr: "Hayatım" },
-                { esp: "Te extraño", tr: "Seni özlüyorum" },
-                { esp: "Eres hermosa", tr: "Çok güzelsin" },
-                { esp: "Me gustas", tr: "Senden hoşlanıyorum" }
-            ]
-        };
-
-        let aktifMod = 'kelime_avi';
+        const tg = window.Telegram.WebApp; tg.expand();
         let toplamSkor = 0;
-        let secilenKartlar = [];
-        let eslesenSayisi = 0;
 
-        function oyunuKur(mod) {
-            const alan = document.getElementById("oyunAlani");
-            alan.innerHTML = ""; 
-            document.getElementById("bitirBtn").style.display = "none";
-            secilenKartlar = [];
-            eslesenSayisi = 0;
+        // DEV KELİME HAVUZU
+        const kelimeHavuzu = [
+            { esp: "¡Hola!", tr: "Merhaba" }, { esp: "Gracias", tr: "Teşekkürler" },
+            { esp: "Buenos días", tr: "Günaydın" }, { esp: "Buenas noches", tr: "İyi geceler" },
+            { esp: "Madre", tr: "Anne" }, { esp: "Padre", tr: "Baba" },
+            { esp: "Uno", tr: "Bir" }, { esp: "Cinco", tr: "Beş" },
+            { esp: "Diez", tr: "On" }, { esp: "Te amo", tr: "Seni seviyorum" },
+            { esp: "Mi amor", tr: "Aşkım" }, { esp: "Te extraño", tr: "Seni özlüyorum" },
+            { esp: "Hablar", tr: "Konuşmak" }, { esp: "Comer", tr: "Yemek yemek" },
+            { esp: "Grande", tr: "Büyük" }, { esp: "Pequeño", tr: "Küçük" },
+            { esp: "Por favor", tr: "Lütfen" }, { esp: "De nada", tr: "Rica ederim" }
+        ];
 
-            let mevcutHavuz = oyunVerileri[mod];
-            let kartHavuzu = [];
+        function skoruGuncelle(puan) {
+            toplamSkor += puan;
+            document.getElementById("genelSkor").innerText = toplamSkor;
+        }
 
-            mevcutHavuz.forEach((k, index) => {
-                kartHavuzu.push({ text: k.esp, type: 'esp', id: index });
-                kartHavuzu.push({ text: k.tr, type: 'tr', id: index });
+        function ekranDegistir(ekranAdi, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('aktif'));
+            document.querySelectorAll('.ekran').forEach(e => e.classList.remove('aktif'));
+            btn.classList.add('aktif');
+            
+            clearInterval(zkZamanlayici); // Başka ekrana geçince zamanlayıcıyı durdur
+
+            if(ekranAdi === 'avi') { document.getElementById('ekranAvi').classList.add('aktif'); aviKur(); }
+            if(ekranAdi === 'zamana_karsi') { document.getElementById('ekranZamanaKarsi').classList.add('aktif'); zkBaslat(); }
+            if(ekranAdi === 'hafiza') { document.getElementById('ekranHafiza').classList.add('aktif'); hafizaKur(); }
+            if(ekranAdi === 'dogru_yanlis') { document.getElementById('ekranDogruYanlis').classList.add('aktif'); tfBaslat(); }
+        }
+
+        // ================= OYUN 1: KELİME AVI =================
+        let aviSecilenler = [], aviEslesenler = 0;
+        function aviKur() {
+            const alan = document.getElementById("alanAvi"); alan.innerHTML = "";
+            aviSecilenler = []; aviEslesenler = 0;
+            let list = [...kelimeHavuzu].sort(() => Math.random() - 0.5).slice(0, 5);
+            let kartlar = [];
+            list.forEach((k, i) => {
+                kartlar.push({ text: k.esp, type: 'esp', id: i });
+                kartlar.push({ text: k.tr, type: 'tr', id: i });
             });
-
-            // Kartları karıştır
-            kartHavuzu.sort(() => Math.random() - 0.5);
-
-            kartHavuzu.forEach(k => {
-                const div = document.createElement("div");
-                div.className = "kart";
-                div.innerText = k.text;
-                div.dataset.id = k.id;
-                div.dataset.type = k.type;
-                div.onclick = () => kartSec(div);
+            kartlar.sort(() => Math.random() - 0.5);
+            kartlar.forEach(k => {
+                const div = document.createElement("div"); div.className = "kart"; div.innerText = k.text;
+                div.dataset.id = k.id; div.dataset.type = k.type;
+                div.onclick = () => {
+                    if(div.classList.contains('dogru') || div.classList.contains('secili')) return;
+                    div.classList.add('secili'); aviSecilenler.push(div);
+                    if(aviSecilenler.length === 2) {
+                        let k1 = aviSecilenler[0], k2 = aviSecilenler[1];
+                        if(k1.dataset.id === k2.dataset.id && k1.dataset.type !== k2.dataset.type) {
+                            k1.className = "kart dogru"; k2.className = "kart dogru";
+                            skoruGuncelle(50); aviEslesenler++;
+                            confetti({ particleCount: 20, spread: 30, origin: { y: 0.8 } });
+                            if(aviEslesenler === 5) büyükKonfeti();
+                        } else {
+                            setTimeout(() => { k1.remove('secili'); k2.remove('secili'); }, 400);
+                        }
+                        aviSecilenler = [];
+                    }
+                };
                 alan.appendChild(div);
             });
         }
 
-        function modDegistir(yeniMod, element) {
-            document.querySelectorAll('.mod-btn').forEach(btn => btn.classList.remove('aktif'));
-            element.classList.add('aktif');
-            aktifMod = yeniMod;
-            oyunuKur(yeniMod);
+        // ================= OYUN 2: ZAMANA KARŞI =================
+        let zkZamanlayici, zkDogruCevap, zkSureSol;
+        function zkBaslat() {
+            clearInterval(zkZamanlayici);
+            let soru = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)];
+            document.getElementById("zkSoru").innerText = soru.esp;
+            
+            let yanlisSoru = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)];
+            while(yanlisSoru.tr === soru.tr) { yanlisSoru = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)]; }
+
+            let rand = Math.random() > 0.5;
+            document.getElementById("zkSikA").innerText = rand ? soru.tr : yanlisSoru.tr;
+            document.getElementById("zkSikB").innerText = rand ? yanlisSoru.tr : soru.tr;
+            zkDogruCevap = rand ? 0 : 1;
+
+            zkSureSol = 100;
+            zkZamanlayici = setInterval(() => {
+                zkSureSol -= 3.5; // Hız barı
+                document.getElementById("zkSure").style.width = zkSureSol + "%";
+                if(zkSureSol <= 0) { clearInterval(zkZamanlayici); zkBaslat(); }
+            }, 100);
+        }
+        function zkCevapVer(secim) {
+            clearInterval(zkZamanlayici);
+            if(secim === zkDogruCevap) {
+                skoruGuncelle(40);
+                confetti({ particleCount: 20, colors: ['#00d2ff', '#fff'] });
+            }
+            zkBaslat();
         }
 
-        function kartSec(element) {
-            if (element.classList.contains('dogru') || element.classList.contains('secili')) return;
-
-            element.classList.add('secili');
-            secilenKartlar.push(element);
-
-            if (secilenKartlar.length === 2) {
-                const k1 = secilenKartlar[0];
-                const k2 = secilenKartlar[1];
-
-                if (k1.dataset.id === k2.dataset.id && k1.dataset.type !== k2.dataset.type) {
-                    k1.className = "kart dogru";
-                    k2.className = "kart dogru";
-                    
-                    // Skor artışı ve tabela güncellemesi
-                    toplamSkor += 30; 
-                    document.getElementById("skor").innerText = toplamSkor;
-                    eslesenSayisi++;
-
-                    // ANLIK BAŞARI KONFETİSİ (Ufak Patlama)
-                    confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0 } });
-                    confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1 } });
-
-                    if (eslesenSayisi === oyunVerileri[aktifMod].length) {
-                        // BÜYÜK FİNAL KONFETİ YAĞMURU 🌟
-                        büyükKonfetiPatlat();
-                        document.getElementById("bitirBtn").style.display = "inline-block";
+        // ================= OYUN 3: HAFIZA KARTLARI =================
+        let hafizaSecilenler = [], hafizaEslesenler = 0;
+        function hafizaKur() {
+            const alan = document.getElementById("alanHafiza"); alan.innerHTML = "";
+            hafizaSecilenler = []; hafizaEslesenler = 0;
+            let list = [...kelimeHavuzu].sort(() => Math.random() - 0.5).slice(0, 4);
+            let kartlar = [];
+            list.forEach((k, i) => {
+                kartlar.push({ text: k.esp, id: i }); kartlar.push({ text: k.tr, id: i });
+            });
+            kartlar.sort(() => Math.random() - 0.5);
+            kartlar.forEach(k => {
+                const div = document.createElement("div"); div.className = "hafiza-kart"; div.innerText = k.text;
+                div.dataset.id = k.id;
+                div.onclick = () => {
+                    if(div.classList.contains('acik') || div.classList.contains('eslesmis') || hafizaSecilenler.length >= 2) return;
+                    div.classList.add('acik'); hafizaSecilenler.push(div);
+                    if(hafizaSecilenler.length === 2) {
+                        let h1 = hafizaSecilenler[0], h2 = hafizaSecilenler[1];
+                        if(h1.dataset.id === h2.dataset.id) {
+                            setTimeout(() => {
+                                h1.className = "hafiza-kart eslesmis"; h2.className = "hafiza-kart eslesmis";
+                                skoruGuncelle(60); hafizaEslesenler++;
+                                confetti({ particleCount: 25, spread: 40 });
+                                if(hafizaEslesenler === 4) büyükKonfeti();
+                            }, 300);
+                        } else {
+                            setTimeout(() => { h1.classList.remove('acik'); h2.classList.remove('acik'); }, 800);
+                        }
+                        setTimeout(() => { hafizaSecilenler = []; }, 850);
                     }
-                } else {
-                    setTimeout(() => {
-                        k1.classList.remove('secili');
-                        k2.classList.remove('secili');
-                    }, 400);
-                }
-                secilenKartlar = [];
+                };
+                alan.appendChild(div);
+            });
+        }
+
+        // ================= OYUN 4: DOĞRU MU YANLIŞ MI =================
+        let tfGercekDurum = false;
+        function tfBaslat() {
+            let anaKelime = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)];
+            document.getElementById("tfEsp").innerText = anaKelime.esp;
+
+            let rastgeleSecim = Math.random() > 0.5;
+            if(rastgeleSecim) {
+                // Doğru eşleştirme ver
+                document.getElementById("tfTr").innerText = anaKelime.tr;
+                tfGercekDurum = true;
+            } else {
+                // Yanlış eşleştirme ver
+                let yanlisKelime = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)];
+                while(yanlisKelime.tr === anaKelime.tr) { yanlisKelime = kelimeHavuzu[Math.floor(Math.random() * kelimeHavuzu.length)]; }
+                document.getElementById("tfTr").innerText = yanlisKelime.tr;
+                tfGercekDurum = false;
             }
         }
+        function tfCevapVer(kullaniciSecimi) {
+            if(kullaniciSecimi === tfGercekDurum) {
+                skoruGuncelle(30);
+                confetti({ particleCount: 15, colors: ['#2ecc71', '#ffca28'] });
+            }
+            tfBaslat();
+        }
 
-        // MUHTEŞEM 3 SANİYELİK COŞKULU KONFETİ REZİTALİ
-        function büyükKonfetiPatlat() {
-            var duration = 3 * 1000;
-            var end = Date.now() + duration;
-
+        // ================= ORTAK BÜYÜK ŞOV EFEKTİ =================
+        function büyükKonfeti() {
+            var end = Date.now() + 2 * 1000;
             (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
-
-                if (Date.now() < end) {
-                    requestAnimationFrame(frame);
-                }
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0, y: 0.7 } });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1, y: 0.7 } });
+                if (Date.now() < end) requestAnimationFrame(frame);
             }());
         }
 
         function skoruBotaGonder() {
-            if (tg.sendData) {
-                tg.sendData(toplamSkor.toString());
-            } else {
-                alert("Tebrikler! Toplam Skor: " + toplamSkor + " XP kanka!");
-            }
+            clearInterval(zkZamanlayici);
+            if (tg.sendData) { tg.sendData(toplamSkor.toString()); } 
+            else { alert("Toplam Skor: " + toplamSkor + " XP!"); }
             tg.close();
         }
 
-        // Oyunu ilk mod ile başlat
-        oyunuKur('kelime_avi');
+        // İlk oyunla start ver
+        aviKur();
     </script>
 </body>
 </html>
